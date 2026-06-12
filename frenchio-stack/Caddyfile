@@ -1,0 +1,297 @@
+# ==========================================================
+# 🚀 Caddy : yourdomain.com
+#
+#   /                → Stremio Web App (player complet)
+#   /addon/*         → Frenchio addon (manifest, streams, configure)
+#   /downloads/*     → Fichiers téléchargés (qBittorrent)
+#
+# HTTPS géré par Cloudflare Tunnel, auto_https désactivé.
+# ==========================================================
+
+{
+    auto_https off
+}
+
+:80 {
+    log {
+        output stdout
+        format console
+    }
+
+    # ── 0. Centralized Password Protection (Login Redirection) ───────────────────
+    @no-auth {
+        not path /login*
+        not path /downloads*
+        not path /badges.json
+        not path /badge-telecharge.png
+        not path /plugin*
+        not path /manifest/{$MANIFEST_TOKEN}/*
+        not path_regexp ^/addon/(?:[^/]+/)?(?:manifest\.json|stream/|resolve/)
+        not header Cookie *frenchio_auth=frenchio_admin_123*
+    }
+    redir @no-auth /login 302
+
+    # ── 1. Fichiers de téléchargement qBittorrent ──────────────
+    handle_path /downloads* {
+        root * /downloads
+        header {
+            Access-Control-Allow-Origin  "*"
+            Access-Control-Allow-Methods "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+            Access-Control-Expose-Headers "Content-Length,Content-Range"
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        file_server browse
+    }
+
+    # ── 2. Frenchio Addon (toutes les routes API Stremio) ──────
+    # Route : /addon/manifest.json
+    # Route : /addon/{config}/manifest.json
+    # Route : /addon/{config}/stream/...
+    # Route : /addon/{config}/resolve/...
+    # Route : /addon/configure
+    # Route : /addon/{config}/configure
+    # ── 1c. Frenchio Configuration Portal ──────────────────────
+    handle /frenchio {
+        rewrite * /configure
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /p2p {
+        rewrite * /p2p-configure
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle_path /addon* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    # ── 2a. Frenchio Addon API ──────────────────────────────────────────────────
+    handle /api* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    # ── 2b. qBittorrent WebUI (Accès externe sécurisé sous /qbittorrent) ──────────
+    redir /qbittorrent /qbittorrent/
+
+    handle_path /qbittorrent* {
+        reverse_proxy qbittorrent:8080 {
+            header_up Referer ""
+            header_up Origin ""
+            header_down -X-Frame-Options
+            header_down -Content-Security-Policy
+        }
+    }
+
+    # ── 2c. TorrServer WebUI (Accès externe sécurisé sous /torrserver) ──────────
+    redir /torrserver /torrserver/
+
+    handle_path /torrserver* {
+        reverse_proxy torrserver:8090 {
+            header_up Referer ""
+            header_up Origin ""
+            header_down -X-Frame-Options
+            header_down -Content-Security-Policy
+        }
+    }
+
+    # Match exactly the index HTML path
+    @joal-ui-index {
+        path /joal-secret/ui/ /joal-secret/ui/index.html
+    }
+    handle @joal-ui-index {
+        root * /joal_ui
+        uri strip_prefix /joal-secret/ui
+        file_server
+    }
+    handle /joal-secret* {
+        reverse_proxy joal:20781 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port 443
+            header_down -X-Frame-Options
+            header_down -Content-Security-Policy
+        }
+    }
+
+
+
+    # ── 3. Accès au Portal, Login et Endpoints Publics (séparés) ────────────────
+    handle /login* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /manifest/{$MANIFEST_TOKEN}/* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /configure* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /p2p-configure* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /vpn* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /network* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /explorer* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /updates* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle /service-view* {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    handle / {
+        header {
+            Cache-Control "no-store, no-cache, no-transform, must-revalidate, private, max-age=0"
+            CDN-Cache-Control "no-store"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            flush_interval -1
+        }
+    }
+
+    # ── 5. Badges JSON + images (Frenchio custom badges pour Nuvio) ────────────
+    handle /badges.json {
+        root * /app
+        rewrite * /frenchio-badges.json
+        header Content-Type application/json
+        header Access-Control-Allow-Origin "*"
+        file_server
+    }
+    handle /badge-telecharge.png {
+        root * /app
+        header Access-Control-Allow-Origin "*"
+        file_server
+    }
+
+    # ── 5b. Plugin P2P Nuvio ────────────────────────────────────────
+    # Plugin JS + manifest servis sans auth (Nuvio doit pouvoir les télécharger)
+    handle /plugin* {
+        header {
+            Access-Control-Allow-Origin  "*"
+            Access-Control-Allow-Methods "GET, OPTIONS"
+            Access-Control-Allow-Headers "*"
+        }
+        reverse_proxy frenchio:7777 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+        }
+    }
+
+    # ── 4. Redirection pour tout autre chemin (fallback vers le Portal) ───────────
+    handle {
+        redir * / 302
+    }
+}

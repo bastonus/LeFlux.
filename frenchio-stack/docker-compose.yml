@@ -1,0 +1,117 @@
+services:
+  frenchio:
+    image: ghcr.io/aymene69/frenchio:latest
+    container_name: frenchio-addon
+    restart: unless-stopped
+    environment:
+      - PORT=7777
+      - CONFIG_B64=${CONFIG_B64}
+      - DOMAIN=${DOMAIN}
+      - MANIFEST_TOKEN=${MANIFEST_TOKEN}
+    volumes:
+      - ./config:/app/config
+      - ./main.py:/app/main.py:ro
+      - ./qbittorrent.py:/app/services/qbittorrent.py:ro
+      - ./torrserver.py:/app/services/torrserver.py:ro
+      - ./services/tr4ker.py:/app/services/tr4ker.py:ro
+      - ./utils.py:/app/utils.py:ro
+      - ./templates/login.html:/app/templates/login.html:ro
+      - ./templates/portal.html:/app/templates/portal.html:ro
+      - ./templates/explorer.html:/app/templates/explorer.html:ro
+      - ./templates/updates.html:/app/templates/updates.html:ro
+      - ./templates/configure.html:/app/templates/configure.html:ro
+      - ./templates/p2p.html:/app/templates/p2p.html:ro
+      - ./templates/vpn.html:/app/templates/vpn.html:ro
+      - ./templates/network.html:/app/templates/network.html:ro
+      - ./templates/service_frame.html:/app/templates/service_frame.html:ro
+      - ./downloads:/downloads
+      - ../frenchio-nuvio-plugin:/frenchio-nuvio-plugin:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../.git:/app/.git
+      - /home/azandikka/.gitconfig:/root/.gitconfig:ro
+      - /home/azandikka/.git-credentials:/root/.git-credentials:ro
+    depends_on:
+      - qbittorrent
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: frenchio-qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - WEBUI_PORT=8080
+    volumes:
+      - ./qb_config:/config
+      - ./downloads:/downloads
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    restart: unless-stopped
+
+  joal:
+    image: anthonyraymond/joal:latest
+    container_name: frenchio-joal
+    restart: unless-stopped
+    volumes:
+      - ./joal_data:/data
+    ports:
+      - "20781:20781"
+    command:
+      - --joal-conf=/data
+      - --spring.main.web-environment=true
+      - --server.port=20781
+      - --joal.ui.path.prefix=joal-secret
+      - --joal.ui.secret-token=joal-secret-key
+      - --server.forward-headers-strategy=FRAMEWORK
+
+  caddy:
+    image: caddy:alpine
+    container_name: frenchio-caddy
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./downloads:/downloads:ro
+      - ./joal_ui:/joal_ui:ro
+      - ./frenchio-badges.json:/app/frenchio-badges.json:ro
+      - ./badge-telecharge.png:/app/badge-telecharge.png:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "8082:80"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - CONFIG_B64=${CONFIG_B64}
+      - MANIFEST_TOKEN=${MANIFEST_TOKEN}
+    depends_on:
+      - frenchio
+      - joal
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: frenchio-tunnel
+    restart: unless-stopped
+    command: tunnel run --token ${TUNNEL_TOKEN}
+    depends_on:
+      - caddy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  torrserver:
+    image: ghcr.io/yourok/torrserver:latest
+    container_name: torrserver
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - TS_PATH=/db
+    volumes:
+      - ./torrserver_db:/db
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

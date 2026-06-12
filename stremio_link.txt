@@ -1,0 +1,24 @@
+# ============================================================
+# LeFlux — Liens générés (Exemple)
+# ============================================================
+
+[1] PORTAL CENTRALISÉ LEFLUX (Mot de passe: frenchio_admin_123) :
+https://yourdomain.com/
+
+[2] APP LECTEUR WEB NUVIO (Ajouter l'addon manifest ci-dessous) :
+https://web.nuvioapp.space/
+
+[3] MANIFEST FRENCHIO STATIQUE (Recommandé - Ne change jamais si vos clés changent) :
+https://yourdomain.com/manifest/YOUR_STATIC_MANIFEST_TOKEN/manifest.json
+
+[4] MANIFEST FRENCHIO DYNAMIQUE (Contient la config encodée) :
+https://yourdomain.com/addon/YOUR_BASE64_ENCODED_CONFIG/manifest.json
+
+[5] CONFIGURATION FRENCHIO :
+https://yourdomain.com/frenchio
+
+[6] WebUI qBittorrent (externe, accessible partout) :
+https://yourdomain.com/qbittorrent/  (admin / adminadmin)
+
+[7] WebUI JOAL (externe, accessible partout) :
+https://yourdomain.com/joal-secret/ui/

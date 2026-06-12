@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+        // qBittorrent WebUI integration shim for iframe context (must load before iframe elements)
+        (function() {
+            const mockHandler = {
+                get: function(target, prop) {
+                    if (prop === 'then') return undefined;
+                    if (typeof prop === 'symbol') {
+                        if (prop === Symbol.toPrimitive) {
+                            return () => 'qMock';
+                        }
+                        return undefined;
+                    }
+                    if (prop === 'toString' || prop === 'valueOf') {
+                        return () => 'qMock';
+                    }
+                    return new Proxy(function() {}, mockHandler);
+                },
+                apply: function(target, thisArg, argumentsList) {
+                    return new Proxy(function() {}, mockHandler);
+                }
+            };
+            window.qBittorrent = new Proxy(function() {}, mockHandler);
+        })();
+
+        // MooTools compat shim — qBittorrent calls parent.getCoordinates()
+        if (typeof window.getCoordinates === 'undefined') {
+            window.getCoordinates = function() {
+                return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight, right: window.innerWidth, bottom: window.innerHeight };
+            };
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeFlux. — {{SERVICE_NAME}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23111111'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-size='60' font-weight='bold' fill='white' text-anchor='middle'%3EF.%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        :root {
+            --bg: #0e0e10;
+            --surface-0: #141416;
+            --surface-1: #1c1c1f;
+            --surface-2: #242428;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.14);
+            --text-primary: #f0f0f2;
+            --text-secondary: #9898a8;
+            --accent-dim: rgba(224,224,232,0.08);
+            --radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        /* ── HEADER ─────────────────────────────── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-0);
+            height: 60px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-badge {
+            font-size: 0.62rem;
+            font-weight: 600;
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            padding: 3px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .service-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-title strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            background: var(--accent-dim);
+        }
+
+        /* ── IFRAME CONTAINER ───────────────────── */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 60px);
+            background: var(--bg);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: transparent;
+        }
+
+        /* ── LOADER ─────────────────────────────── */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 10;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+
+        .loader-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255,255,255,0.07);
+            border-top: 3px solid var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loader-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* ── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 16px;
+                height: auto;
+                min-height: 60px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .logo-badge {
+                display: none;
+            }
+            .service-title {
+                font-size: 0.85rem;
+            }
+            .service-title span {
+                display: none;
+            }
+            .iframe-container {
+                height: calc(100% - 60px);
+            }
+        }
+        @media (max-width: 480px) {
+            .service-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/{{CONFIG_B64}}/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+            <span class="logo-text">LeFlux.</span>
+            <span class="logo-badge">Control Center</span>
+        </a>
+        <div class="service-title">
+            <span>Intégration</span>
+            <span>&rarr;</span>
+            <strong>{{SERVICE_NAME}}</strong>
+        </div>
+        <div>
+            <a href="/{{CONFIG_B64}}/" class="btn-back">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Retour au portail
+            </a>
+        </div>
+    </header>
+
+    <div class="iframe-container">
+        <div class="loader-overlay" id="loaderOverlay">
+            <div class="spinner"></div>
+            <div class="loader-text">Chargement de {{SERVICE_NAME}}...</div>
+        </div>
+        <iframe id="serviceIframe" src="{{IFRAME_URL}}" onload="hideLoader()"></iframe>
+    </div>
+
+    <script>
+        function hideLoader() {
+            const loader = document.getElementById('loaderOverlay');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+        }
+        
+        // Timeout backup in case onload doesn't fire due to cache or errors
+        setTimeout(hideLoader, 5000);
+    </script>
+</body>
+</html>

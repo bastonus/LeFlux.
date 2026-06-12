@@ -1,0 +1,13 @@
+{
+  "name": "frenchio-p2p",
+  "version": "1.0.0",
+  "description": "LeFlux. P2P — Nuvio plugin for French trackers (C411, Torr9, TR4KER, Gemini)",
+  "scripts": {
+    "build": "node build.js",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}

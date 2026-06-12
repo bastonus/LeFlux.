@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeFlux. — Mises à jour & Patches</title>
+    <meta name="description" content="LeFlux. — Gérer vos versions et patches de stack">
+    <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23111111'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-size='60' font-weight='bold' fill='white' text-anchor='middle'%3EF.%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        :root {
+            --bg: #0e0e10;
+            --surface-0: #141416;
+            --surface-1: #1c1c1f;
+            --surface-2: #242428;
+            --surface-3: #2c2c31;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.14);
+            --text-primary: #f0f0f2;
+            --text-secondary: #9898a8;
+            --text-muted: #5a5a6e;
+            --accent: #e0e0e8;
+            --accent-dim: rgba(224,224,232,0.08);
+            --accent-hover: rgba(224,224,232,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── HEADER ─────────────────────────────── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-0);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--surface-3);
+            color: var(--text-secondary);
+            padding: 3px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            background: var(--accent-dim);
+        }
+
+        /* ── MAIN ──────────────────────────────── */
+        main {
+            flex: 1;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 32px 60px;
+        }
+
+        .updates-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .updates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .updates-title h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .updates-last-check {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-refresh {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-refresh:hover {
+            background: var(--surface-2);
+            border-color: var(--border-hover);
+        }
+
+        .services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .service-item {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: border-color 0.15s ease;
+        }
+
+        .service-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .service-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .service-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .service-icon-wrap {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .service-icon-wrap img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .service-icon-wrap svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .service-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .service-version {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .service-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: capitalize;
+        }
+
+        .digest-info {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--surface-0);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .digest-info span {
+            color: var(--text-primary);
+        }
+
+        .patches-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .patches-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-select {
+            background: var(--surface-0);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .patch-code {
+            background: var(--surface-0);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #f59e0b;
+            max-height: 250px;
+            display: none;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+
+        .btn-update-service {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #f59e0b;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .btn-update-service:hover:not(:disabled) {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-update-service:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── MODAL ── */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.open {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-body {
+            padding: 24px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 16px 24px;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--border);
+        }
+        .btn-modal {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-modal-cancel {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-modal-confirm {
+            background: var(--text-primary);
+            border: 1px solid var(--text-primary);
+            color: var(--bg);
+        }
+
+        /* Global overlay */
+        .global-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 12, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .global-overlay.open {
+            display: flex;
+        }
+        .global-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 16px !important;
+                height: auto !important;
+                min-height: 58px !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .logo-badge {
+                display: none !important;
+            }
+            main {
+                padding: 20px 16px 40px !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .header-actions {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            .header-actions button,
+            .header-actions a {
+                flex: 1 !important;
+                justify-content: center !important;
+                padding: 8px 10px !important;
+                font-size: 0.75rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+            <span class="logo-text">LeFlux.</span>
+            <span class="logo-badge">Control Center</span>
+        </a>
+        <div class="header-actions">
+            <a href="/" class="btn-logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Retour au Portal
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="updates-card">
+            <div class="updates-header">
+                <div class="updates-title">
+                    <h2>Mises à jour & Patches</h2>
+                    <div class="updates-last-check">Dernière vérification : <span id="last-check-time">-</span></div>
+                </div>
+                <button id="btnRefreshUpdates" onclick="triggerUpdateCheck()" class="btn-refresh">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Rechercher maintenant
+                </button>
+            </div>
+
+            <div class="services-list">
+                <!-- Frenchio Service -->
+                <div class="service-item">
+                    <div class="service-item-top">
+                        <div class="service-info">
+                            <div class="service-icon-wrap">
+                                <svg viewBox="0 0 3 2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                    <rect width="1" height="2" fill="#00209F"/>
+                                    <rect x="1" width="1" height="2" fill="#FFFFFF"/>
+                                    <rect x="2" width="1" height="2" fill="#E60515"/>
+                                </svg>
+                            </div>
+                            <div class="service-details">
+                                <div class="service-name">LeFlux. Addon (basé sur Frenchio) <span id="version-frenchio" class="service-version"></span></div>
+                                <div class="service-desc">Vérifie l'état de mise à jour des scripts de l'addon.</div>
+                            </div>
+                        </div>
+                        <span id="status-frenchio" class="status-badge">-</span>
+                    </div>
+                    
+                    <div id="patches-box" class="patches-box" style="display: none;">
+                        <div class="patches-title">Patches locaux détectés (Modifications du code) :</div>
+                        <select id="patch-file-select" onchange="showSelectedPatch()" class="modal-select">
+                            <option value="">Choisir un fichier modifié...</option>
+                        </select>
+                        <pre id="patch-viewer" class="patch-code"></pre>
+                    </div>
+
+                    <button id="btn-update-frenchio" onclick="applyUpdate('frenchio')" class="btn-update-service" style="display: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Mettre à jour LeFlux. Addon
+                    </button>
+                </div>
+
+                <!-- qBittorrent Service -->
+                <div class="service-item">
+                    <div class="service-item-top">
+                        <div class="service-info">
+                            <div class="service-icon-wrap">
+                                <img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/qbittorrent.svg" alt="qBittorrent" onerror="this.outerHTML='QB'">
+                            </div>
+                            <div class="service-details">
+                                <div class="service-name">qBittorrent <span id="version-qbit" class="service-version"></span></div>
+                                <div class="service-desc">Client torrent gérant le stockage et le cache.</div>
+                            </div>
+                        </div>
+                        <span id="status-qbit" class="status-badge">-</span>
+                    </div>
+
+                    <div class="digest-info">
+                        <div>Local Image Digest : <span id="digest-local-qbit">-</span></div>
+                        <div>Registry Image Digest : <span id="digest-reg-qbit">-</span></div>
+                    </div>
+
+                    <button id="btn-update-qbit" onclick="applyUpdate('qbittorrent')" class="btn-update-service" style="display: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Mettre à jour qBittorrent
+                    </button>
+                </div>
+
+                <!-- TorrServer Service -->
+                <div class="service-item">
+                    <div class="service-item-top">
+                        <div class="service-info">
+                            <div class="service-icon-wrap" style="display:flex;align-items:center;justify-content:center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #fb923c;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                            <div class="service-details">
+                                <div class="service-name">TorrServer <span id="version-torrserver" class="service-version"></span></div>
+                                <div class="service-desc">Moteur de streaming BitTorrent à priorisation dynamique.</div>
+                            </div>
+                        </div>
+                        <span id="status-torrserver" class="status-badge">-</span>
+                    </div>
+
+                    <div class="digest-info">
+                        <div>Local Image Digest : <span id="digest-local-torrserver">-</span></div>
+                        <div>Registry Image Digest : <span id="digest-reg-torrserver">-</span></div>
+                    </div>
+
+                    <button id="btn-update-torrserver" onclick="applyUpdate('torrserver')" class="btn-update-service" style="display: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Mettre à jour TorrServer
+                    </button>
+                </div>
+
+                <!-- JOAL Service -->
+                <div class="service-item">
+                    <div class="service-item-top">
+                        <div class="service-info">
+                            <div class="service-icon-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22V10M12 10C12 10 9 6 4 9C4 9 8 13 12 10ZM12 10C12 10 15 6 20 9C20 9 16 13 12 10Z"/>
+                                </svg>
+                            </div>
+                            <div class="service-details">
+                                <div class="service-name">JOAL <span id="version-joal" class="service-version"></span></div>
+                                <div class="service-desc">Simulateur d'upload pour maintenir le ratio.</div>
+                            </div>
+                        </div>
+                        <span id="status-joal" class="status-badge">-</span>
+                    </div>
+
+                    <div class="digest-info">
+                        <div>Local Image Digest : <span id="digest-local-joal">-</span></div>
+                        <div>Registry Image Digest : <span id="digest-reg-joal">-</span></div>
+                    </div>
+
+                    <button id="btn-update-joal" onclick="applyUpdate('joal')" class="btn-update-service" style="display: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Mettre à jour JOAL
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom alert/confirm modal -->
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Message</h3>
+                <button onclick="closeCustomModal()" class="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button id="btnModalCancel" onclick="closeCustomModal()" class="btn-modal btn-modal-cancel">Annuler</button>
+                <button id="btnModalConfirm" class="btn-modal btn-modal-confirm">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Loading Overlay -->
+    <div id="globalOverlay" class="global-overlay">
+        <div class="global-spinner"></div>
+        <div id="overlayMessage" style="font-size: 0.95rem; font-weight: 500; text-align: center; max-width: 80%;">Traitement en cours...</div>
+    </div>
+
+    <script>
+        let activePatches = {};
+
+        function showGlobalOverlay(msg) {
+            document.getElementById('overlayMessage').textContent = msg;
+            document.getElementById('globalOverlay').classList.add('open');
+        }
+
+        function showCustomAlert(title, text) {
+            return new Promise((resolve) => {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalBody').textContent = text;
+                document.getElementById('btnModalCancel').style.display = 'none';
+                const confirmBtn = document.getElementById('btnModalConfirm');
+                confirmBtn.style.display = 'block';
+                confirmBtn.textContent = "OK";
+                confirmBtn.onclick = () => {
+                    closeCustomModal();
+                    resolve(true);
+                };
+                document.getElementById('customModal').classList.add('open');
+            });
+        }
+
+        function showCustomConfirm(title, text) {
+            return new Promise((resolve) => {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalBody').textContent = text;
+                const cancelBtn = document.getElementById('btnModalCancel');
+                cancelBtn.style.display = 'block';
+                cancelBtn.textContent = "Annuler";
+                
+                const confirmBtn = document.getElementById('btnModalConfirm');
+                confirmBtn.style.display = 'block';
+                confirmBtn.textContent = "Confirmer";
+                confirmBtn.onclick = () => {
+                    closeCustomModal();
+                    resolve(true);
+                };
+                cancelBtn.onclick = () => {
+                    closeCustomModal();
+                    resolve(false);
+                };
+                document.getElementById('customModal').classList.add('open');
+            });
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.remove('open');
+        }
+
+        async function loadUpdatesStatus() {
+            try {
+                const resp = await fetch('/api/updates/status');
+                const data = await resp.json();
+                
+                document.getElementById('last-check-time').textContent = data.last_check || "Aucune vérification";
+                
+                // Versions
+                document.getElementById('version-frenchio').textContent = data.frenchio.version || "-";
+                document.getElementById('version-joal').textContent = data.joal.version || "-";
+                document.getElementById('version-qbit').textContent = data.qbittorrent.version || "-";
+                if (data.torrserver) {
+                    document.getElementById('version-torrserver').textContent = data.torrserver.version || "-";
+                }
+                
+                // 1. Frenchio
+                const fStatus = document.getElementById('status-frenchio');
+                const pBox = document.getElementById('patches-box');
+                const btnFrenchio = document.getElementById('btn-update-frenchio');
+                
+                activePatches = data.frenchio.modified_files || {};
+                
+                // Reset select list
+                const select = document.getElementById('patch-file-select');
+                select.innerHTML = '<option value="">Choisir un fichier modifié...</option>';
+                const files = Object.keys(activePatches);
+                
+                if (files.length > 0) {
+                    files.forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f;
+                        opt.textContent = f;
+                        select.appendChild(opt);
+                    });
+                    pBox.style.display = "flex";
+                } else {
+                    pBox.style.display = "none";
+                    document.getElementById('patch-viewer').style.display = "none";
+                }
+
+                if (data.frenchio.up_to_date) {
+                    fStatus.textContent = "À jour";
+                    fStatus.style.background = "rgba(110, 231, 183, 0.15)";
+                    fStatus.style.color = "#6ee7b7";
+                    btnFrenchio.style.display = "none";
+                } else {
+                    fStatus.textContent = "Mise à jour disponible";
+                    fStatus.style.background = "rgba(245, 158, 11, 0.15)";
+                    fStatus.style.color = "#f59e0b";
+                    btnFrenchio.style.display = "inline-flex";
+                }
+                
+                // 2. Joal
+                const jStatus = document.getElementById('status-joal');
+                const btnJoal = document.getElementById('btn-update-joal');
+                document.getElementById('digest-local-joal').textContent = data.joal.local_digest ? data.joal.local_digest.substring(0, 12) : "-";
+                document.getElementById('digest-reg-joal').textContent = data.joal.registry_digest ? data.joal.registry_digest.substring(0, 12) : "-";
+                if (data.joal.up_to_date) {
+                    jStatus.textContent = "À jour";
+                    jStatus.style.background = "rgba(110, 231, 183, 0.15)";
+                    jStatus.style.color = "#6ee7b7";
+                    btnJoal.style.display = "none";
+                } else {
+                    jStatus.textContent = "Mise à jour dispo";
+                    jStatus.style.background = "rgba(245, 158, 11, 0.15)";
+                    jStatus.style.color = "#f59e0b";
+                    btnJoal.style.display = "inline-flex";
+                }
+
+                // 3. qBittorrent
+                const qStatus = document.getElementById('status-qbit');
+                const btnQbit = document.getElementById('btn-update-qbit');
+                document.getElementById('digest-local-qbit').textContent = data.qbittorrent.local_digest ? data.qbittorrent.local_digest.substring(0, 12) : "-";
+                document.getElementById('digest-reg-qbit').textContent = data.qbittorrent.registry_digest ? data.qbittorrent.registry_digest.substring(0, 12) : "-";
+                if (data.qbittorrent.up_to_date) {
+                    qStatus.textContent = "À jour";
+                    qStatus.style.background = "rgba(110, 231, 183, 0.15)";
+                    qStatus.style.color = "#6ee7b7";
+                    btnQbit.style.display = "none";
+                } else {
+                    qStatus.textContent = "Mise à jour dispo";
+                    qStatus.style.background = "rgba(245, 158, 11, 0.15)";
+                    qStatus.style.color = "#f59e0b";
+                    btnQbit.style.display = "inline-flex";
+                }
+
+                // 4. TorrServer
+                if (data.torrserver) {
+                    const tsStatus = document.getElementById('status-torrserver');
+                    const btnTs = document.getElementById('btn-update-torrserver');
+                    document.getElementById('digest-local-torrserver').textContent = data.torrserver.local_digest ? data.torrserver.local_digest.substring(0, 12) : "-";
+                    document.getElementById('digest-reg-torrserver').textContent = data.torrserver.registry_digest ? data.torrserver.registry_digest.substring(0, 12) : "-";
+                    if (data.torrserver.up_to_date) {
+                        tsStatus.textContent = "À jour";
+                        tsStatus.style.background = "rgba(110, 231, 183, 0.15)";
+                        tsStatus.style.color = "#6ee7b7";
+                        btnTs.style.display = "none";
+                    } else {
+                        tsStatus.textContent = "Mise à jour dispo";
+                        tsStatus.style.background = "rgba(245, 158, 11, 0.15)";
+                        tsStatus.style.color = "#f59e0b";
+                        btnTs.style.display = "inline-flex";
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading updates status:", e);
+            }
+        }
+
+        function showSelectedPatch() {
+            const file = document.getElementById('patch-file-select').value;
+            const viewer = document.getElementById('patch-viewer');
+            if (file && activePatches[file]) {
+                viewer.textContent = activePatches[file];
+                viewer.style.display = "block";
+            } else {
+                viewer.textContent = "";
+                viewer.style.display = "none";
+            }
+        }
+
+        async function triggerUpdateCheck() {
+            const btn = document.getElementById('btnRefreshUpdates');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 0.8s linear infinite; margin-right: 4px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.05" x2="19.07" y2="4.93"/></svg>
+                    Recherche...
+                `;
+            }
+            try {
+                await fetch('/api/updates/check', { method: 'POST' });
+                await new Promise(r => setTimeout(r, 2000));
+                await loadUpdatesStatus();
+            } catch(e) {
+                console.error(e);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Rechercher maintenant
+                    `;
+                }
+            }
+        }
+
+        async function applyUpdate(component) {
+            const confirmUpdate = await showCustomConfirm(
+                "Mettre à jour " + component + " ?",
+                "Voulez-vous vraiment lancer la mise à jour pour " + component + " ? " + 
+                (component === 'frenchio' ? "Une sauvegarde git automatique avec commit & push sera effectuée avant d'appliquer." : "")
+            );
+            if (!confirmUpdate) return;
+            
+            showGlobalOverlay("Mise à jour de " + component + " en cours...");
+            try {
+                const resp = await fetch('/api/updates/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ component })
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    showGlobalOverlay(result.message);
+                    setTimeout(() => window.location.reload(), 5000);
+                } else {
+                    document.getElementById('globalOverlay').classList.remove('open');
+                    await showCustomAlert("Erreur de mise à jour", result.message);
+                }
+            } catch (e) {
+                document.getElementById('globalOverlay').classList.remove('open');
+                await showCustomAlert("Erreur de connexion", "Impossible de contacter l'API de mise à jour.");
+            }
+        }
+
+        // Load initially
+        loadUpdatesStatus();
+    </script>
+</body>
+</html>

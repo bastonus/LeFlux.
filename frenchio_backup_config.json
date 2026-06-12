@@ -1,0 +1,51 @@
+{
+    "tmdb_key": "",
+    "alldebrid_key": "",
+    "torbox_key": "",
+    "debridlink_key": "",
+    "realdebrid_key": "",
+    "trackers": [],
+    "abn_username": "admin",
+    "abn_password": "",
+    "lacale_apikey": "",
+    "c411_apikey": "",
+    "torr9_passkey": "",
+    "gemini_apikey": "",
+    "tr4ker_apikey": "",
+    "max_size": 50,
+    "sort_by": "tracker_priority",
+    "providers_order": [
+        "gemini",
+        "tr4ker",
+        "unit3d",
+        "torr9",
+        "abn",
+        "c411",
+        "lacale"
+    ],
+    "mediaflow": null,
+    "client_mode": "torrserver",
+    "qbittorrent": null,
+    "torrserver": {
+        "host": "http://torrserver:8090",
+        "username": "",
+        "password": ""
+    },
+    "p2p_links": [
+        {
+            "token": "",
+            "name": "LeFlux.",
+            "sync": true,
+            "keys": {},
+            "max_size_gb": 50,
+            "sort_by": "seeders"
+        }
+    ],
+    "vpn": {
+        "enabled": false,
+        "provider": "protonvpn",
+        "private_key": "testing_key",
+        "addresses": "10.2.0.2/32"
+    },
+    "addon_instances": []
+}

@@ -1,0 +1,16 @@
+# Ignore local container data and downloads
+frenchio-stack/config/
+frenchio-stack/qb_config/
+frenchio-stack/downloads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Credentials & notes
+credentials_note.txt
+*.key
+*.token
+*.passkey
+.env
+*.env

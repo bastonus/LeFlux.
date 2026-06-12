@@ -1,0 +1,20 @@
+{
+  "name": "LeFlux.",
+  "version": "1.0.0",
+  "scrapers": [
+    {
+      "id": "leflux-p2p.",
+      "name": "LeFlux. P2P",
+      "description": "Search and play magnet links locally on your device with LeFlux.",
+      "version": "1.0.0",
+      "author": "Community",
+      "supportedTypes": ["movie", "tv"],
+      "filename": "providers/frenchio-p2p.js",
+      "enabled": true,
+      "formats": ["magnet", "torrent"],
+      "logo": "logo.svg",
+      "contentLanguage": ["fr", "en"],
+      "hasSettings": true
+    }
+  ]
+}

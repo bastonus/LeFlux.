@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeFlux. — Gestion des plugins P2P</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23111111'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-size='60' font-weight='bold' fill='white' text-anchor='middle'%3EF.%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        :root {
+            --bg: #0e0e10;
+            --surface-0: #141416;
+            --surface-1: #1c1c1f;
+            --surface-2: #242428;
+            --surface-3: #2c2c31;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.14);
+            --text-primary: #f0f0f2;
+            --text-secondary: #9898a8;
+            --text-muted: #5a5a6e;
+            --accent: #e0e0e8;
+            --accent-dim: rgba(224,224,232,0.08);
+            --accent-hover: rgba(224,224,232,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── HEADER ─────────────────────────────── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-0);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--surface-3);
+            color: var(--text-secondary);
+            padding: 3px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            background: var(--accent-dim);
+        }
+
+        /* ── MAIN ──────────────────────────────── */
+        main {
+            flex: 1;
+            max-width: 850px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 32px 60px;
+        }
+
+        .page-title-wrap {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-primary);
+        }
+
+        .help-text {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-family: inherit;
+            background: var(--surface-0);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        input[type="text"]:hover,
+        input[type="password"]:hover,
+        input[type="number"]:hover,
+        select:hover {
+            border-color: var(--border-hover);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--text-primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg);
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 100%;
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-dim);
+            border-color: var(--border-hover);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .url-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: var(--surface-0);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin-top: 6px;
+        }
+
+        .url-text {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex: 1;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .btn-copy {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-copy:hover {
+            background: var(--accent-dim);
+            border-color: var(--border-hover);
+        }
+
+        .btn-copy.copied {
+            background: var(--success);
+            color: var(--bg);
+            border-color: var(--success);
+        }
+
+        /* Global overlay */
+        .global-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 12, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .global-overlay.open {
+            display: flex;
+        }
+        .global-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .keys-section {
+            background: rgba(0,0,0,0.15);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.02);
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .keys-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        /* ── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 16px !important;
+                height: auto !important;
+                min-height: 58px !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .logo-badge {
+                display: none !important;
+            }
+            main {
+                padding: 20px 16px 40px !important;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-actions {
+                width: 100% !important;
+                justify-content: space-between !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .header-actions button,
+            .header-actions a {
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+                padding: 8px 10px !important;
+                font-size: 0.75rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+            <span class="logo-text">LeFlux.</span>
+            <span class="logo-badge">Control Center</span>
+        </a>
+        <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="btn btn-primary" onclick="addNewP2PLink()" style="margin: 0; padding: 8px 16px; font-size: 0.85rem; border-radius: var(--radius-sm); background: var(--surface-3); border: 1px solid var(--border); color: var(--text-primary);">Nouveau lien P2P</button>
+            <button type="button" class="btn btn-primary" onclick="saveP2PLinks()" style="margin: 0; padding: 8px 16px; font-size: 0.85rem; border-radius: var(--radius-sm);">Enregistrer les modifications</button>
+            <a href="/" class="btn-logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Retour au Portal
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-title-wrap">
+            <h1 class="page-title" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:24px;height:24px;color:var(--primary-glow);"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+                <span>Plugins P2P LeFlux.</span>
+            </h1>
+            <div class="page-subtitle">Configurez des instances autonomes du plugin P2P pour vos différents appareils (TV, mobile, etc.).</div>
+        </div>
+
+        <div id="p2pLinksContainer">
+            <!-- Rendered dynamically -->
+        </div>
+
+        <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+            <button type="button" class="btn btn-outline" onclick="addNewP2PLink()" style="max-width: 300px;">+ Ajouter un lien P2P</button>
+            <button type="button" class="btn btn-primary" onclick="saveP2PLinks()" style="max-width: 300px;">Enregistrer toutes les modifications</button>
+        </div>
+    </main>
+
+    <!-- Global overlay -->
+    <div id="globalOverlay" class="global-overlay">
+        <div class="global-spinner"></div>
+        <div class="global-status" id="globalStatus">Sauvegarde de la configuration...</div>
+    </div>
+
+    <script>
+        let p2pLinks = [];
+
+        // Load links on startup
+        async function loadP2PLinks() {
+            showGlobalOverlay("Chargement des liens P2P...");
+            try {
+                const response = await fetch('/api/p2p/links');
+                if (response.ok) {
+                    const data = await response.json();
+                    p2pLinks = data.links || [];
+                }
+            } catch (e) {
+                console.error("Error loading P2P links:", e);
+            } finally {
+                hideGlobalOverlay();
+            }
+            renderP2PLinks();
+        }
+
+        function renderP2PLinks() {
+            const container = document.getElementById('p2pLinksContainer');
+            if (!container) return;
+
+            if (p2pLinks.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 60px 24px; color: var(--text-secondary);">
+                        <p style="font-size: 1rem; font-weight: 500; margin-bottom: 8px;">Aucun lien P2P n'est configuré pour le moment.</p>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Cliquez sur le bouton ci-dessus pour configurer votre premier lien.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            p2pLinks.forEach((link, i) => {
+                const manifestUrl = `https://{{DOMAIN}}/plugin/${link.token}/manifest.json`;
+                const isSynced = link.sync !== false; // default to true
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h2 style="display:flex;align-items:center;gap:8px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:18px;height:18px;color:var(--primary-glow);"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+                            <span>Lien P2P #${i + 1}</span>
+                        </h2>
+                        <button onclick="deleteP2PLink(${i})" class="btn-danger">Supprimer ce lien</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label for="p2p_name_${i}">Nom du plugin (affiché dans Nuvio)</label>
+                            <input type="text" id="p2p_name_${i}" value="${link.name}" placeholder="Ex: LeFlux. P2P TV" />
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; padding-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" id="p2p_sync_${i}" ${isSynced ? 'checked' : ''} onchange="toggleP2PLinkSync(${i}, this.checked)" style="width: 16px; height: 16px; accent-color: var(--text-primary);" />
+                                <span>Synchroniser les clés avec l'Addon Frenchio principal</span>
+                            </label>
+                            <span class="help-text">Utilise les clés API configurées sur votre Control Center.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label for="p2p_maxsize_${i}">Taille Max par torrent (GB)</label>
+                            <input type="number" id="p2p_maxsize_${i}" value="${link.max_size_gb || 50}" />
+                            <span class="help-text">Filtre les torrents dépassant cette taille.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="p2p_sort_${i}">Tri des flux</label>
+                            <select id="p2p_sort_${i}">
+                                <option value="seeders" ${link.sort_by === 'seeders' ? 'selected' : ''}>Seeders</option>
+                                <option value="size_desc" ${link.sort_by === 'size_desc' ? 'selected' : ''}>Taille (descendant)</option>
+                                <option value="size_asc" ${link.sort_by === 'size_asc' ? 'selected' : ''}>Taille (ascendant)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Custom keys section -->
+                    <div id="p2p_keys_container_${i}" class="keys-section" style="display: ${isSynced ? 'none' : 'flex'};">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 6px;">Clés API Trackers Spécifiques</div>
+                        <div class="keys-grid">
+                            <div class="form-group">
+                                <label for="p2p_key_c411_api_${i}">C411 — API Key</label>
+                                <input type="password" id="p2p_key_c411_api_${i}" value="${link.keys?.c411_apikey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_c411_pass_${i}">C411 — Passkey</label>
+                                <input type="password" id="p2p_key_c411_pass_${i}" value="${link.keys?.c411_passkey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_torr9_${i}">Torr9 — Passkey</label>
+                                <input type="password" id="p2p_key_torr9_${i}" value="${link.keys?.torr9_passkey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_tr4ker_api_${i}">TR4KER — API Key</label>
+                                <input type="password" id="p2p_key_tr4ker_api_${i}" value="${link.keys?.tr4ker_apikey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_tr4ker_pass_${i}">TR4KER — Passkey</label>
+                                <input type="password" id="p2p_key_tr4ker_pass_${i}" value="${link.keys?.tr4ker_passkey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_gemini_api_${i}">Gemini — API Key</label>
+                                <input type="password" id="p2p_key_gemini_api_${i}" value="${link.keys?.gemini_apikey || ''}" />
+                            </div>
+                            <div class="form-group">
+                                <label for="p2p_key_gemini_pass_${i}">Gemini — Passkey</label>
+                                <input type="password" id="p2p_key_gemini_pass_${i}" value="${link.keys?.gemini_passkey || ''}" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label>URL du manifest P2P (à ajouter dans Nuvio)</label>
+                        <div class="url-row">
+                            <div class="url-text" id="p2p_manifest_url_${i}">${manifestUrl}</div>
+                            <button type="button" class="btn-copy" id="copyP2PBtn_${i}">Copier</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+                setupCopyBtn(`copyP2PBtn_${i}`, `p2p_manifest_url_${i}`);
+            });
+        }
+
+        function toggleP2PLinkSync(index, checked) {
+            p2pLinks[index].sync = checked;
+            const keysContainer = document.getElementById(`p2p_keys_container_${index}`);
+            if (keysContainer) {
+                keysContainer.style.display = checked ? 'none' : 'flex';
+            }
+        }
+
+        function addNewP2PLink() {
+            const token = Array.from({length: 32}, () => Math.floor(Math.random()*16).toString(16)).join('');
+            p2pLinks.push({
+                token: token,
+                name: "LeFlux. P2P " + (p2pLinks.length + 1),
+                sync: true,
+                keys: {
+                    c411_apikey: "",
+                    c411_passkey: "",
+                    torr9_passkey: "",
+                    tr4ker_apikey: "",
+                    tr4ker_passkey: "",
+                    gemini_apikey: "",
+                    gemini_passkey: ""
+                },
+                max_size_gb: 50,
+                sort_by: "seeders"
+            });
+            renderP2PLinks();
+        }
+
+        function deleteP2PLink(index) {
+            p2pLinks.splice(index, 1);
+            renderP2PLinks();
+        }
+
+        async function saveP2PLinks() {
+            const finalLinks = p2pLinks.map((link, i) => {
+                const sync = document.getElementById(`p2p_sync_${i}`).checked;
+                return {
+                    token: link.token,
+                    name: document.getElementById(`p2p_name_${i}`).value.trim() || `LeFlux. P2P ${i + 1}`,
+                    sync: sync,
+                    keys: sync ? {} : {
+                        c411_apikey: document.getElementById(`p2p_key_c411_api_${i}`).value.trim(),
+                        c411_passkey: document.getElementById(`p2p_key_c411_pass_${i}`).value.trim(),
+                        torr9_passkey: document.getElementById(`p2p_key_torr9_${i}`).value.trim(),
+                        tr4ker_apikey: document.getElementById(`p2p_key_tr4ker_api_${i}`).value.trim(),
+                        tr4ker_passkey: document.getElementById(`p2p_key_tr4ker_pass_${i}`).value.trim(),
+                        gemini_apikey: document.getElementById(`p2p_key_gemini_api_${i}`).value.trim(),
+                        gemini_passkey: document.getElementById(`p2p_key_gemini_pass_${i}`).value.trim()
+                    },
+                    max_size_gb: parseFloat(document.getElementById(`p2p_maxsize_${i}`).value) || 50,
+                    sort_by: document.getElementById(`p2p_sort_${i}`).value
+                };
+            });
+
+            showGlobalOverlay("Enregistrement de la configuration...");
+            try {
+                const response = await fetch('/api/p2p/links', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ links: finalLinks })
+                });
+
+                if (response.ok) {
+                    alert("Configurations enregistrées avec succès !");
+                } else {
+                    alert("Erreur lors de la sauvegarde.");
+                }
+            } catch (e) {
+                console.error("Error saving P2P links:", e);
+                alert("Erreur de connexion avec le serveur.");
+            } finally {
+                hideGlobalOverlay();
+                renderP2PLinks();
+            }
+        }
+
+        function setupCopyBtn(btnId, textId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = document.getElementById(textId).textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = 'Copié !';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+                });
+            });
+        }
+
+        function showGlobalOverlay(statusText) {
+            const overlay = document.getElementById('globalOverlay');
+            const status = document.getElementById('globalStatus');
+            if (overlay && status) {
+                status.textContent = statusText;
+                overlay.classList.add('open');
+            }
+        }
+
+        function hideGlobalOverlay() {
+            const overlay = document.getElementById('globalOverlay');
+            if (overlay) overlay.classList.remove('open');
+        }
+
+        // Initialize on startup
+        window.addEventListener('DOMContentLoaded', loadP2PLinks);
+    </script>
+</body>
+</html>

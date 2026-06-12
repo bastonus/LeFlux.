@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeFlux. P2P — Configuration</title>
+  <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23111111'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-size='60' font-weight='bold' fill='white' text-anchor='middle'%3EF.%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --surface: #12121e;
+      --surface-2: #1a1a2e;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: rgba(99,102,241,0.6);
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --accent-glow: rgba(99,102,241,0.25);
+      --text: #f0f0ff;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,102,241,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 60%);
+    }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      max-width: 640px;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 24px var(--accent-glow);
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent);
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Form Fields ── */
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    label .badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .badge-optional {
+      background: rgba(107,114,128,0.15);
+      color: var(--text-muted);
+      border: 1px solid rgba(107,114,128,0.2);
+    }
+
+    .badge-required {
+      background: rgba(99,102,241,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(99,102,241,0.25);
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"] {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    .hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .hint a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .hint a:hover { text-decoration: underline; }
+
+    /* Toggle password visibility */
+    .toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 16px;
+      padding: 4px;
+      transition: color 0.15s;
+    }
+
+    .toggle-btn:hover { color: var(--text); }
+
+    /* ── Inline row ── */
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; margin-bottom: 0; }
+
+    /* ── Action Section ── */
+    .actions {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 12px;
+      padding: 14px 20px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(99,102,241,0.45);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    /* ── Result Box ── */
+    #result-box {
+      display: none;
+      width: 100%;
+      max-width: 640px;
+      background: var(--surface);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 4px;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--success);
+      margin-bottom: 12px;
+    }
+
+    .url-display {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 12px;
+      word-break: break-all;
+      color: var(--text-dim);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .steps {
+      background: rgba(99,102,241,0.07);
+      border: 1px solid rgba(99,102,241,0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .steps h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .steps ol {
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      background: rgba(99,102,241,0.2);
+      color: var(--accent);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--success);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Info note ── */
+    .note {
+      display: flex;
+      gap: 10px;
+      background: rgba(245,158,11,0.07);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    .note-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* ── Tracker status dots ── */
+    .tracker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tracker-row:last-child { border-bottom: none; }
+
+    .tracker-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .tracker-status {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .status-active {
+      background: rgba(16,185,129,0.12);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+
+    .status-inactive {
+      background: rgba(107,114,128,0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(107,114,128,0.15);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🇫🇷</div>
+    <div class="header-text">
+      <h1>LeFlux. P2P</h1>
+      <p>Plugin Nuvio — Trackers français sans serveur</p>
+    </div>
+  </header>
+
+
+
+  <!-- Tracker credentials -->
+  <div class="card">
+    <div class="card-title">🔐 Clés des Trackers</div>
+
+    <div class="field">
+      <label>
+        C411 — API Key
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="c411_apikey" placeholder="Exemple : 14d695e9ed..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('c411_apikey', this)">👁</button>
+      </div>
+      <div class="hint">Votre API token C411 (UNIT3D). Recherche par TMDB/IMDB ID.</div>
+    </div>
+
+    <div class="field">
+      <label>
+        C411 — Announce Passkey
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="c411_passkey" placeholder="Exemple : 65b8259e81..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('c411_passkey', this)">👁</button>
+      </div>
+      <div class="hint">Votre passkey d'annonce C411 (32 caractères hexadécimaux). Requis pour le streaming direct P2P sans téléchargement de torrent.</div>
+    </div>
+
+    <div class="field">
+      <label>
+        Torr9 — Passkey
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="torr9_passkey" placeholder="Exemple : 498879354a..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('torr9_passkey', this)">👁</button>
+      </div>
+      <div class="hint">Votre passkey Torr9. Recherche par TMDB/IMDB ID et annonce P2P.</div>
+    </div>
+
+    <div class="field">
+      <label>
+        TR4KER — API Key
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="tr4ker_apikey" placeholder="Exemple : tr4k_cb1ee..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('tr4ker_apikey', this)">👁</button>
+      </div>
+      <div class="hint">Votre API key TR4KER. Utilise Torznab (recherche par titre).</div>
+    </div>
+
+    <div class="field">
+      <label>
+        TR4KER — Announce Passkey
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="tr4ker_passkey" placeholder="Exemple : 8c8da0ae43..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('tr4ker_passkey', this)">👁</button>
+      </div>
+      <div class="hint">Votre passkey d'annonce TR4KER (32 caractères hexadécimaux). Requis pour le streaming direct P2P sans téléchargement de torrent.</div>
+    </div>
+
+    <div class="field">
+      <label>
+        Gemini Tracker — API Token
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="gemini_apikey" placeholder="Exemple : bjzYRVZI53..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('gemini_apikey', this)">👁</button>
+      </div>
+      <div class="hint">Votre token Gemini Tracker. Recherche par TMDB/IMDB ID.</div>
+    </div>
+
+    <div class="field">
+      <label>
+        Gemini Tracker — Announce Passkey
+        <span class="badge badge-optional">Optionnel</span>
+      </label>
+      <div class="input-wrap">
+        <input type="password" id="gemini_passkey" placeholder="Exemple : 8a2ef200b6..."
+               autocomplete="off" spellcheck="false" />
+        <button class="toggle-btn" onclick="toggleField('gemini_passkey', this)">👁</button>
+      </div>
+      <div class="hint">Votre passkey d'annonce Gemini Tracker (32 caractères hexadécimaux). Optionnel (peut être extrait automatiquement).</div>
+    </div>
+  </div>
+
+  <!-- Options -->
+  <div class="card">
+    <div class="card-title">⚙️ Options de filtrage</div>
+
+    <div class="row">
+      <div class="field">
+        <label>Taille max par fichier (GB)</label>
+        <input type="number" id="max_size_gb" value="50" min="0" max="500" step="5" />
+        <div class="hint">0 = pas de limite</div>
+      </div>
+      <div class="field">
+        <label>Tri par</label>
+        <select id="sort_by" style="
+          width:100%; background: var(--surface-2); border: 1px solid var(--border);
+          border-radius: 10px; padding: 12px 16px; font-size: 14px;
+          font-family: inherit; color: var(--text); outline: none;
+          -webkit-appearance: none; cursor: pointer;
+        ">
+          <option value="seeders">Seeders (desc)</option>
+          <option value="size_desc">Taille (desc)</option>
+          <option value="size_asc">Taille (asc)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="card" style="padding:16px 20px;">
+    <div class="note">
+      <span class="note-icon">💡</span>
+      <div>
+        <strong style="color:var(--text);">P2P dans Nuvio</strong><br/>
+        Pour que le streaming fonctionne, activez <strong>Paramètres → Lecture → Autoriser les streams P2P</strong> dans l'application Nuvio. Le plugin retourne des liens magnet ; c'est le moteur natif de Nuvio qui gère le téléchargement P2P.
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-primary" onclick="generateURL()">
+      ✨ Générer l'URL d'installation
+    </button>
+    <button class="btn-secondary" onclick="loadFromURL()">
+      🔄 Charger depuis l'URL actuelle
+    </button>
+  </div>
+
+  <!-- Result -->
+  <div id="result-box">
+    <div class="result-label">✅ URL générée — Copiez-la dans Nuvio</div>
+    <div class="url-display" id="url-output"></div>
+    <button class="btn-primary" onclick="copyURL()" style="width:100%;">
+      📋 Copier l'URL
+    </button>
+    <div class="steps">
+      <h4>Comment installer dans Nuvio</h4>
+      <ol>
+        <li>Copiez l'URL ci-dessus</li>
+        <li>Ouvrez Nuvio → Paramètres → Plugins</li>
+        <li>Appuyez sur <strong>Ajouter un plugin</strong></li>
+        <li>Collez l'URL et confirmez</li>
+        <li>Activez les streams P2P dans Paramètres → Lecture</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="toast">✅ URL copiée !</div>
+
+  <script>
+    // ── Determine base URL for the manifest ──
+    function getBaseURL() {
+      const loc = window.location;
+      return loc.origin + loc.pathname.replace('configure.html', '');
+    }
+
+    // ── Encode config to Base64 ──
+    function encodeConfig(cfg) {
+      return btoa(JSON.stringify(cfg));
+    }
+
+    // ── Decode config from Base64 ──
+    function decodeConfig(b64) {
+      try {
+        const padded = b64 + '=='.slice(0, (4 - b64.length % 4) % 4);
+        return JSON.parse(atob(padded));
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ── Toggle password visibility ──
+    function toggleField(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+      }
+    }
+
+    // ── Load config from URL query param (if page opened with ?config=...) ──
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const configStr = params.get('config');
+      if (!configStr) {
+        alert('Aucune configuration trouvée dans l\'URL actuelle.');
+        return;
+      }
+      const cfg = decodeConfig(configStr);
+      if (!cfg) {
+        alert('Configuration invalide dans l\'URL.');
+        return;
+      }
+      fillForm(cfg);
+      showToast('Configuration chargée !');
+    }
+
+    function fillForm(cfg) {
+      const fields = [
+        'c411_apikey', 'c411_passkey',
+        'torr9_passkey',
+        'tr4ker_apikey', 'tr4ker_passkey',
+        'gemini_apikey', 'gemini_passkey'
+      ];
+      fields.forEach(function(f) {
+        var el = document.getElementById(f);
+        if (el && cfg[f] !== undefined) el.value = cfg[f];
+      });
+      if (cfg.max_size_gb !== undefined) document.getElementById('max_size_gb').value = cfg.max_size_gb;
+      if (cfg.sort_by) document.getElementById('sort_by').value = cfg.sort_by;
+    }
+
+    // ── Generate install URL ──
+    function generateURL() {
+      const cfg = {
+        c411_apikey:    document.getElementById('c411_apikey').value.trim(),
+        c411_passkey:   document.getElementById('c411_passkey').value.trim(),
+        torr9_passkey:  document.getElementById('torr9_passkey').value.trim(),
+        tr4ker_apikey:  document.getElementById('tr4ker_apikey').value.trim(),
+        tr4ker_passkey: document.getElementById('tr4ker_passkey').value.trim(),
+        gemini_apikey:  document.getElementById('gemini_apikey').value.trim(),
+        gemini_passkey: document.getElementById('gemini_passkey').value.trim(),
+        max_size_gb:    parseFloat(document.getElementById('max_size_gb').value) || 50,
+        sort_by:        document.getElementById('sort_by').value,
+      };
+
+      const hasTracker = cfg.c411_apikey || cfg.torr9_passkey || cfg.tr4ker_apikey || cfg.gemini_apikey;
+      if (!hasTracker) {
+        alert('⚠️ Entrez au moins une clé de tracker (C411, Torr9, TR4KER ou Gemini).');
+        return;
+      }
+
+      const configB64 = encodeConfig(cfg);
+      const base = getBaseURL();
+      const url = base + 'manifest.json?config=' + configB64;
+
+      document.getElementById('url-output').textContent = url;
+      document.getElementById('result-box').style.display = 'block';
+      document.getElementById('result-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ── Copy URL to clipboard ──
+    function copyURL() {
+      const url = document.getElementById('url-output').textContent;
+      if (!url) return;
+      navigator.clipboard.writeText(url).then(function() {
+        showToast('✅ URL copiée !');
+      }).catch(function() {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('✅ URL copiée !');
+      });
+    }
+
+    // ── Toast notification ──
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+
+    // ── Auto-load config from URL on page open ──
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var configStr = params.get('config');
+      if (configStr) {
+        var cfg = decodeConfig(configStr);
+        if (cfg) fillForm(cfg);
+      }
+    })();
+
+     // ── Live tracker status dots ──
+    function updateTrackerStatus() {
+      var fields = {
+        'c411_apikey':   'status-c411',
+        'c411_passkey':  'status-c411',
+        'torr9_passkey': 'status-torr9',
+        'tr4ker_apikey': 'status-tr4ker',
+        'tr4ker_passkey':'status-tr4ker',
+        'gemini_apikey': 'status-gemini',
+        'gemini_passkey':'status-gemini',
+      };
+    }
+
+    // Update button states on input
+    [
+      'c411_apikey', 'c411_passkey',
+      'torr9_passkey',
+      'tr4ker_apikey', 'tr4ker_passkey',
+      'gemini_apikey', 'gemini_passkey'
+    ].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateTrackerStatus);
+    });
+  </script>
+</body>
+</html>
