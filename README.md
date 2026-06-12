@@ -8,6 +8,16 @@
 
 ---
 
+## Démarrage Rapide
+
+Pour installer et configurer l'ensemble de la stack en une seule commande :
+
+```bash
+git clone https://github.com/bastonus/LeFlux..git && cd LeFlux. && sudo ./install_frenchio.sh && sudo ./start.sh
+```
+
+---
+
 ## Présentation
 
 LeFlux est une solution d'auto-hébergement multimédia conçue pour regrouper et orchestrer vos applications de streaming et de torrent. Elle intègre un moteur de streaming P2P, des utilitaires de diagnostic, une interface d'administration épurée et sécurisée par mot de passe, ainsi qu'une connectivité via les tunnels Cloudflare.
@@ -65,8 +75,8 @@ graph TD
 
 1. Cloner le dépôt :
     ```bash
-    git clone https://github.com/bastonus/Frenchio.git leflux-stack
-    cd leflux-stack
+    git clone https://github.com/bastonus/LeFlux..git
+    cd LeFlux.
     ```
 
 2. Exécuter le script de configuration :
