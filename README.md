@@ -13,7 +13,7 @@
 Pour installer et configurer l'ensemble de la stack en une seule commande :
 
 ```bash
-git clone https://github.com/bastonus/LeFlux..git && cd LeFlux. && sudo ./install_frenchio.sh && sudo ./start.sh
+git clone https://github.com/bastonus/LeFlux..git && cd LeFlux. && sudo ./install_leflux.sh && sudo ./start.sh
 ```
 
 ---
@@ -81,7 +81,7 @@ graph TD
 
 2. Exécuter le script de configuration :
     ```bash
-    sudo ./install_frenchio.sh
+    sudo ./install_leflux.sh
     ```
 
 3. Lancer la stack :
