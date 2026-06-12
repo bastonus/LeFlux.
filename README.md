@@ -114,6 +114,39 @@ sudo ./debug.sh
 
 ---
 
+## Captures d'Écran du Control Center
+
+### 1. Tableau de bord principal (Dashboard)
+Aperçu global en temps réel des services (lecteurs média, addons, indexeurs actifs, clients P2P, exposition réseau et état du VPN).
+![Tableau de bord principal](images/dashboard.png)
+
+### 2. Panneau de Configuration
+Gestion simplifiée des modules de la stack (qBittorrent, TorrServer, JOAL, VPN WireGuard) et sauvegarde de la configuration.
+![Panneau de Configuration](images/configuration.png)
+
+### 3. Lecteur Nuvio - Flux P2P Disponibles
+Interface finale listant les streams et torrents trouvés en direct (résolution, taille, langue et source).
+![Lecteur Nuvio - Flux P2P](images/player_streams.png)
+
+### 4. Client de Téléchargement qBittorrent
+Suivi des torrents actifs et gestionnaire de stockage intégré au panneau d'administration.
+![Client qBittorrent](images/qbittorrent.png)
+
+### 5. Lecteur TorrServer Engine
+Moteur TorrServer intégré pour le streaming direct en cache RAM sans téléchargement de fichier.
+![TorrServer Engine](images/torrserver.png)
+
+### 6. État des Conteneurs & Mises à jour
+Vérification des versions des modules de la stack et notifications de mise à jour des conteneurs Docker.
+![État des Conteneurs](images/updates.png)
+
+### 7. Diagnostics et Console de Logs
+Accès direct aux logs d'exécution des différents conteneurs (Caddy, qBittorrent, Joal, Frenchio Addon) pour simplifier les diagnostics.
+![Console de Logs](images/logs.png)
+
+---
+
 ## Sécurité
 
 Ne partagez pas publiquement vos fichiers `.env`, `frenchio_backup_config.json` ou `stremio_link.txt` sans en avoir expurgé les jetons de connexion et passkeys.
+
