@@ -49,22 +49,10 @@ fi
 # S'assurer que le service Docker tourne
 systemctl enable --now docker
 
-# 3. Paramétrage du port et du domaine
-DEFAULT_PORT="7777"
-if [ -z "$PORT" ]; then
-    read -p "👉 Quel port de secours utiliser pour Caddy ? (Entrée pour $DEFAULT_PORT) : " PORT
-fi
-PORT=${PORT:-$DEFAULT_PORT}
-
-DEFAULT_DOMAIN="localhost:$PORT"
-if [ -z "$DOMAIN" ]; then
-    read -p "👉 Quel domaine ou IP utiliser pour cette machine ? (Entrée pour $DEFAULT_DOMAIN, ex: yourdomain.com) : " DOMAIN
-fi
-DOMAIN=${DOMAIN:-$DEFAULT_DOMAIN}
-
-if [ -z "$TUNNEL_TOKEN" ]; then
-    read -p "👉 Si vous utilisez Cloudflare Tunnel, collez votre Token de Tunnel Zero Trust (Optionnel, laissez vide sinon) : " TUNNEL_TOKEN
-fi
+# 3. Paramétrage par défaut (Lancement local par défaut)
+PORT=${PORT:-"8082"}
+DOMAIN=${DOMAIN:-"localhost:$PORT"}
+TUNNEL_TOKEN=${TUNNEL_TOKEN:-""}
 
 # 4. Création de la structure des dossiers
 echo -e "\n${YELLOW}⏳ Création de l'environnement de travail...${NC}"
